@@ -1,0 +1,24 @@
+version: "3.3"
+
+services:
+  popu-tracker:
+    build: .
+    image: popu-tracker:latest
+    container_name: popu-tracker
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:16.2
+    container_name: popu-tracker-postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "postgres", "-d", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "15432:5432"

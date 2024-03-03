@@ -14,6 +14,7 @@ object Dependencies {
   val CorsHandlerVersion = "1.2.0"
   val SwaggerVersion = "2.11.0"
   val PureConfigVersion = "0.17.5"
+  val JwtVersion = "4.4.0"
 
   // rest
   val akkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
@@ -46,6 +47,9 @@ object Dependencies {
   // hocon config mapping
   val pureConfig = "com.github.pureconfig" %% "pureconfig" % PureConfigVersion
 
+  val jwt = "com.auth0" % "java-jwt" % JwtVersion
+
+
   val commonDependencies: Seq[ModuleID] = Seq(
       akkaHttp
     , sprayJson
@@ -62,5 +66,6 @@ object Dependencies {
     , slickHikariCP
     , postgresqlJdbc
     , pureConfig
+    , jwt
   )
 }

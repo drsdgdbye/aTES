@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  popug-acc:
+    build: .
+    image: popug-acc:latest
+    container_name: popug-acc
+    depends_on:
+      keycloak:
+        condition: service_healthy
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HEALTH_ENABLED=true
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "18080:8080"
+    command:
+      - start-dev

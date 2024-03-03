@@ -1,6 +1,28 @@
 version: "3.3"
 
 services:
+  popug-acc:
+    build:
+      context: popug-acc/
+    image: pupug-acc:lates
+    container_name: auth
+    depends_on:
+      keycloak:
+        condition: service_healthy
+  popu-tracker:
+    build:
+      context: popu-tracker/
+    image: popu-tracker:latest
+    container_name: tracker
+    depends_on:
+      postgres:
+        condition:
+      popug-acc:
+        condition: service_started
+    links:
+      - postgres
+      - keycloak
+
   postgres:
     image: postgres:16.2
     container_name: postgres
@@ -15,3 +37,18 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HEALTH_ENABLED=true
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "7000:8080"
+    command:
+      - start-dev
